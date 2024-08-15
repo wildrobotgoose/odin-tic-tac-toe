@@ -135,20 +135,46 @@ function createScreenController() {
             else {
                 resultDiv.textContent = `${winner} wins!`;
             }
+            removeClickHandlers();
         }
     }
 
-    const addClickHandlers = function() {
+    const createClickHandlers = function() {
+        const handlers = new Array(3);
+        for (let i = 0; i < 3; i++) {
+            handlers[i] = new Array(3);
+            for (let j = 0; j < 3; j++) {
+                handlers[i][j] = () => {
+                    winner = game.playRound(i, j);
+                    updateScreen();
+                };
+            }
+        }
+        return handlers;
+    }
+    const clickHandlers = createClickHandlers();
+
+    const setClickHandlers = function(activate) {
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
                 const cellDiv = document.querySelector(
                     `.cell[data-row="${i}"][data-col="${j}"]`);
-                cellDiv.addEventListener("click", () => {
-                    winner = game.playRound(i, j);
-                    updateScreen();
-                });
+                if (activate) {
+                    cellDiv.addEventListener("click", clickHandlers[i][j]);
+                }
+                else {
+                    cellDiv.removeEventListener("click", clickHandlers[i][j]);
+                }
             }
         }
+    }
+
+    const addClickHandlers = function() {
+        setClickHandlers(true);
+    }
+
+    const removeClickHandlers = function() {
+        setClickHandlers(false);
     }
 
     addClickHandlers();
