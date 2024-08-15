@@ -84,23 +84,24 @@ function createGameController() {
     }
 
     const playRound = function(row, column) {
-        if (board.isMoveValid(row, column)) {
-            board.placeMove(activePlayer, row, column);
+        if (!board.isMoveValid(row, column)) return null;
 
-            totalTurns++;
+        console.log(row, column);
+        board.placeMove(activePlayer, row, column);
 
-            switchTurn();
+        totalTurns++;
 
-            const winner = board.getWinner();
-            if (winner !== null) {
-                return winner;
-            }
-            else if (totalTurns == 9) {
-                return "tie";
-            }
-            else {
-                return null;
-            }
+        switchTurn();
+
+        const winner = board.getWinner();
+        if (winner !== null) {
+            return winner;
+        }
+        else if (totalTurns == 9) {
+            return "tie";
+        }
+        else {
+            return null;
         }
     }
 
