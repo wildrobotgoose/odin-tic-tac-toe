@@ -76,31 +76,31 @@ function createBoard() {
 function createGameController() {
     const board = createBoard();
 
-    const players = [createPlayer(1, "Player One"),
-                     createPlayer(2, "Player Two")];
-
     let totalTurns = 0;
-    let currentTurn = 0;
+    let activePlayer = 0;
 
     const switchTurn = function() {
-        currentTurn = 1 - currentTurn;
+        activePlayer = 1 - activePlayer;
     }
 
     const playRound = function(row, column) {
         if (board.isMoveValid(row, column)) {
-            board.placeMove(players[currentTurn].id, row, column);
+            board.placeMove(activePlayer, row, column);
 
             totalTurns++;
-            const winnerId = board.getWinner();
-            if (winnerId !== null) {
-                const winner = players.find(player => player.id == winnerId);
-                console.log(`${winner.name} wins!`);
-            }
-            else if (totalTurns == 9) {
-                console.log("It's a tie!");
-            }
 
             switchTurn();
+
+            const winner = board.getWinner();
+            if (winner !== null) {
+                return winner;
+            }
+            else if (totalTurns == 9) {
+                return "tie";
+            }
+            else {
+                return null;
+            }
         }
     }
 
@@ -110,6 +110,7 @@ function createGameController() {
 function createScreenController() {
     const boardDiv = document.querySelector(".board");
     const game = createGameController();
+    let winner = null;
 
     const updateScreen = function() {
         const board = game.getBoard();
@@ -125,6 +126,16 @@ function createScreenController() {
                 }
             }
         }
+
+        if (winner !== null) {
+            const resultDiv = document.querySelector(".result");
+            if (winner == "tie") {
+                resultDiv.textContent = "It's a tie!";
+            }
+            else {
+                resultDiv.textContent = `${winner} wins!`;
+            }
+        }
     }
 
     const addClickHandlers = function() {
@@ -133,7 +144,7 @@ function createScreenController() {
                 const cellDiv = document.querySelector(
                     `.cell[data-row="${i}"][data-col="${j}"]`);
                 cellDiv.addEventListener("click", () => {
-                    game.playRound(i, j);
+                    winner = game.playRound(i, j);
                     updateScreen();
                 });
             }
