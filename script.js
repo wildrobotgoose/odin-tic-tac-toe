@@ -62,14 +62,15 @@ function createBoard() {
         return null;
     }
 
-    const printBoard = function() {
+    const getBoardStatus = function() {
+        const boardStatus = new Array(3);
         for (let i = 0; i < 3; i++) {
-            console.log(board[i].map(cell =>
-                cell.isOccupied() ? cell.getOccupier() : '.'));
+            boardStatus[i] = board[i].map(cell => cell.getOccupier());
         }
+        return boardStatus;
     }
 
-    return {isMoveValid, placeMove, getWinner, printBoard};
+    return {isMoveValid, placeMove, getWinner, getBoardStatus};
 }
 
 function createGameController() {
@@ -88,7 +89,6 @@ function createGameController() {
     const playRound = function(row, column) {
         if (board.isMoveValid(row, column)) {
             board.placeMove(players[currentTurn].id, row, column);
-            board.printBoard();
 
             totalTurns++;
             const winnerId = board.getWinner();
@@ -104,5 +104,46 @@ function createGameController() {
         }
     }
 
-    return {playRound};
+    return {playRound, getBoard: board.getBoardStatus};
 }
+
+function createScreenController() {
+    const boardDiv = document.querySelector(".board");
+    const game = createGameController();
+
+    const updateScreen = function() {
+        const board = game.getBoard();
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const cellDiv = document.querySelector(
+                    `.cell[data-row="${i}"][data-col="${j}"]`);
+                if (board[i][j] == null) {
+                    cellDiv.textContent = "";
+                }
+                else {
+                    cellDiv.textContent = board[i][j];
+                }
+            }
+        }
+    }
+
+    const addClickHandlers = function() {
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const cellDiv = document.querySelector(
+                    `.cell[data-row="${i}"][data-col="${j}"]`);
+                cellDiv.addEventListener("click", () => {
+                    game.playRound(i, j);
+                    updateScreen();
+                });
+            }
+        }
+    }
+
+    addClickHandlers();
+
+
+    updateScreen();
+}
+
+createScreenController();
