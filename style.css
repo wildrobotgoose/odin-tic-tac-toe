@@ -5,6 +5,7 @@
 .cell {
     width: 200px;
     height: 200px;
+    font-size: 64px;
     border: black solid 2px;
     display: flex;
     justify-content: center;
